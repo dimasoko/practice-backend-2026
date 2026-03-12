@@ -6,6 +6,10 @@ use App\Models\Survey;
 use App\Models\Response;
 use App\Models\Answer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+Log::info('Survey passed', ['survey_id' => $survey->id, 'user_id' => $user->id]);
+Log::warning('Survey repeat attempt blocked', ['survey_id' => $survey->id, 'user_id' => $user->id]);
 
 class ResponseController extends Controller
 {
