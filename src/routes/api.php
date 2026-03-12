@@ -5,6 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\OptionController;
+use App\Http\Controllers\ResponseController;
+
+// Прохождение опроса
+Route::post('/surveys/{survey}/responses', [ResponseController::class, 'store']);
 
 // Публичные маршруты
 Route::post('/register', [AuthController::class, 'register']);

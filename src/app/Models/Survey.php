@@ -32,4 +32,9 @@ class Survey extends Model
     {
         return $this->status === 'published';
     }
+
+    public function isClosed(): bool
+    {
+        return $this->status === 'closed';
+    }
 }

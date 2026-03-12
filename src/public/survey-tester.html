@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Survey API Tester</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: monospace; background: #0d1117; color: #c9d1d9; display: flex; height: 100vh; overflow: hidden; }
+
+  #sidebar { width: 230px; min-width: 230px; background: #161b22; border-right: 1px solid #30363d; display: flex; flex-direction: column; overflow-y: auto; }
+  #sidebar h2 { padding: 14px 12px 8px; font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #30363d; }
+  .nav-section { padding: 6px 0; border-bottom: 1px solid #21262d; }
+  .nav-section-title { padding: 4px 12px; font-size: 10px; color: #58a6ff; text-transform: uppercase; letter-spacing: 1px; }
+  .nav-item { padding: 7px 12px; cursor: pointer; font-size: 12px; color: #8b949e; display: flex; align-items: center; gap: 8px; transition: background .15s; user-select: none; }
+  .nav-item:hover { background: #21262d; color: #c9d1d9; }
+  .nav-item.active { background: #1f3a5f; color: #58a6ff; }
+  .mb { font-size: 10px; font-weight: bold; padding: 1px 5px; border-radius: 3px; min-width: 38px; text-align: center; }
+  .GET  { background: #033a16; color: #3fb950; }
+  .POST { background: #3a1a00; color: #f78166; }
+  .PUT  { background: #1a2a3a; color: #79c0ff; }
+  .DELETE { background: #3a0020; color: #ff7b72; }
+
+  #token-bar { background: #161b22; border-bottom: 1px solid #30363d; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 12px; flex-shrink: 0; flex-wrap: wrap; }
+  #token-bar label { color: #8b949e; white-space: nowrap; }
+  #base-url-input { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; width: 190px; }
+  #token-select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+  #token-display { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #58a6ff; padding: 4px 8px; border-radius: 4px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 80px; }
+
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #request-header { padding: 10px 16px; border-bottom: 1px solid #30363d; background: #0d1117; flex-shrink: 0; }
+  #request-header h3 { font-size: 13px; color: #8b949e; }
+  #url-bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid #30363d; background: #161b22; flex-shrink: 0; }
+  #method-display { font-weight: bold; font-size: 13px; padding: 6px 12px; border-radius: 4px; min-width: 65px; text-align: center; }
+  #url-input { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 7px 10px; border-radius: 4px; font-size: 13px; font-family: monospace; }
+  #send-btn { background: #238636; color: #fff; border: none; padding: 7px 22px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
+  #send-btn:hover { background: #2ea043; }
+
+  #split { display: flex; flex: 1; overflow: hidden; }
+  #body-panel { width: 42%; border-right: 1px solid #30363d; display: flex; flex-direction: column; }
+  .panel-header { padding: 7px 14px; background: #161b22; border-bottom: 1px solid #30363d; font-size: 11px; color: #8b949e; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  #body-editor { flex: 1; background: #0d1117; border: none; color: #c9d1d9; padding: 12px; font-size: 12px; font-family: monospace; resize: none; outline: none; }
+  #response-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #response-body { flex: 1; overflow-y: auto; padding: 12px; font-size: 12px; font-family: monospace; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+
+  #tokens-panel { padding: 8px 12px; background: #0d1117; border-top: 1px solid #30363d; font-size: 11px; flex-shrink: 0; }
+  .token-entry { display: flex; justify-content: space-between; padding: 2px 0; gap: 6px; }
+  .token-entry b { color: #f0a040; }
+  .token-entry span { color: #3fb950; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .json-key  { color: #79c0ff; }
+  .json-str  { color: #a5d6ff; }
+  .json-num  { color: #f0a040; }
+  .json-bool { color: #ff7b72; }
+  .json-null { color: #8b949e; }
+
+  .small-btn { background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-family: monospace; }
+  .small-btn:hover { background: #30363d; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>📡 Survey API Tester</h2>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Auth</div>
+    <div class="nav-item" data-method="POST" data-path="/api/register"    data-body='{"name":"Иван Тестов","email":"ivan@test.com","password":"password","role":"author"}' data-name="POST /api/register"><span class="mb POST">POST</span> register</div>
+    <div class="nav-item" data-method="POST" data-path="/api/login"       data-body='{"email":"author@test.com","password":"password"}' data-name="POST /api/login (author)"><span class="mb POST">POST</span> login author</div>
+    <div class="nav-item" data-method="POST" data-path="/api/login"       data-body='{"email":"respondent@test.com","password":"password"}' data-name="POST /api/login (respondent)"><span class="mb POST">POST</span> login respondent</div>
+    <div class="nav-item" data-method="POST" data-path="/api/login"       data-body='{"email":"respondent2@test.com","password":"password"}' data-name="POST /api/login (respondent2)"><span class="mb POST">POST</span> login respondent2</div>
+    <div class="nav-item" data-method="GET"  data-path="/api/me"          data-body="" data-name="GET /api/me"><span class="mb GET">GET</span> me</div>
+    <div class="nav-item" data-method="POST" data-path="/api/logout"      data-body="" data-name="POST /api/logout"><span class="mb POST">POST</span> logout</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Surveys</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys"         data-body="" data-name="GET /api/surveys"><span class="mb GET">GET</span> list</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys"         data-body='{"title":"Тестовый опрос","description":"Описание"}' data-name="POST /api/surveys"><span class="mb POST">POST</span> create</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys/1"       data-body="" data-name="GET /api/surveys/1"><span class="mb GET">GET</span> show /1</div>
+    <div class="nav-item" data-method="PUT"    data-path="/api/surveys/1"       data-body='{"title":"Обновлённый заголовок"}' data-name="PUT /api/surveys/1"><span class="mb PUT">PUT</span> update /1</div>
+    <div class="nav-item" data-method="DELETE" data-path="/api/surveys/1"       data-body="" data-name="DELETE /api/surveys/1"><span class="mb DELETE">DEL</span> delete /1</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/publish" data-body="" data-name="POST /api/surveys/1/publish"><span class="mb POST">POST</span> publish /1</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/close"   data-body="" data-name="POST /api/surveys/1/close"><span class="mb POST">POST</span> close /1</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Questions</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/questions"   data-body='{"text":"Ваш любимый язык?","type":"single","order":1}' data-name="POST /api/surveys/1/questions"><span class="mb POST">POST</span> create</div>
+    <div class="nav-item" data-method="PUT"    data-path="/api/surveys/1/questions/1" data-body='{"text":"Обновлённый вопрос?"}' data-name="PUT /api/surveys/1/questions/1"><span class="mb PUT">PUT</span> update /1</div>
+    <div class="nav-item" data-method="DELETE" data-path="/api/surveys/1/questions/1" data-body="" data-name="DELETE /api/surveys/1/questions/1"><span class="mb DELETE">DEL</span> delete /1</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Options</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/questions/1/options"   data-body='{"text":"PHP"}' data-name="POST /api/questions/1/options"><span class="mb POST">POST</span> create</div>
+    <div class="nav-item" data-method="DELETE" data-path="/api/questions/1/options/1" data-body="" data-name="DELETE /api/questions/1/options/1"><span class="mb DELETE">DEL</span> delete /1</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Responses</div>
+    <div class="nav-item" data-method="POST" data-path="/api/surveys/1/responses"
+      data-body='{"answers":[{"question_id":1,"option_ids":[1],"text_value":null},{"question_id":2,"option_ids":[4,5],"text_value":null},{"question_id":3,"option_ids":[],"text_value":"Хочу изучить REST API"}]}'
+      data-name="POST /api/surveys/1/responses"><span class="mb POST">POST</span> submit /1</div>
+  </div>
+
+  <div id="tokens-panel">
+    <div style="color:#8b949e;margin-bottom:4px;">💾 Токены:</div>
+    <div id="tokens-list"><span style="color:#8b949e">—</span></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="token-bar">
+    <label>Base URL:</label>
+    <input id="base-url-input" value="http://localhost:8000" />
+    <label>Токен:</label>
+    <select id="token-select" onchange="selectToken(this.value)">
+      <option value="">— без токена —</option>
+    </select>
+    <div id="token-display">нет активного токена</div>
+    <button class="small-btn" onclick="clearAllTokens()">🗑 Сбросить</button>
+  </div>
+
+  <div id="request-header"><h3 id="route-name">← Выбери маршрут слева</h3></div>
+
+  <div id="url-bar">
+    <div id="method-display" class="mb POST">POST</div>
+    <input id="url-input" value="/api/login" />
+    <button id="send-btn" onclick="sendRequest()">▶ Send</button>
+  </div>
+
+  <div id="split">
+    <div id="body-panel">
+      <div class="panel-header">
+        <span>Request Body (JSON)</span>
+        <button class="small-btn" onclick="formatBody()">Format JSON</button>
+      </div>
+      <textarea id="body-editor" placeholder="{}"></textarea>
+    </div>
+    <div id="response-panel">
+      <div class="panel-header">
+        <span>Response</span>
+        <span id="status-badge" style="font-weight:bold;padding:2px 8px;border-radius:4px;">—</span>
+        <span id="response-time" style="color:#8b949e;font-size:11px;"></span>
+      </div>
+      <div id="response-body" style="color:#8b949e;">Нажми ▶ Send или Ctrl+Enter...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let tokens = JSON.parse(localStorage.getItem('survey_tokens') || '{}');
+let activeToken = localStorage.getItem('survey_active_token') || '';
+let currentMethod = 'POST';
+
+// Attach nav-item clicks via JS (fixes the event.currentTarget bug)
+document.querySelectorAll('.nav-item').forEach(function(el) {
+  el.addEventListener('click', function() {
+    const method = this.getAttribute('data-method');
+    const path   = this.getAttribute('data-path');
+    const body   = this.getAttribute('data-body') || '';
+    const name   = this.getAttribute('data-name');
+
+    currentMethod = method;
+    document.getElementById('url-input').value = path;
+    document.getElementById('body-editor').value = body;
+    document.getElementById('route-name').textContent = name;
+
+    var md = document.getElementById('method-display');
+    md.textContent = method === 'DELETE' ? 'DEL' : method;
+    md.className = 'mb ' + method;
+
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+    this.classList.add('active');
+
+    if (body) formatBody();
+  });
+});
+
+function formatBody() {
+  var ta = document.getElementById('body-editor');
+  try { ta.value = JSON.stringify(JSON.parse(ta.value), null, 2); } catch(e) {}
+}
+
+function syntaxHighlight(json) {
+  if (typeof json !== 'string') json = JSON.stringify(json, null, 2);
+  json = json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(m) {
+    var cls = 'json-num';
+    if (/^"/.test(m)) cls = /:$/.test(m) ? 'json-key' : 'json-str';
+    else if (/true|false/.test(m)) cls = 'json-bool';
+    else if (/null/.test(m)) cls = 'json-null';
+    return '<span class="'+cls+'">'+m+'</span>';
+  });
+}
+
+function saveTokens() {
+  localStorage.setItem('survey_tokens', JSON.stringify(tokens));
+  localStorage.setItem('survey_active_token', activeToken);
+  renderTokens();
+}
+
+function renderTokens() {
+  var list = document.getElementById('tokens-list');
+  var sel  = document.getElementById('token-select');
+  var keys = Object.keys(tokens);
+  list.innerHTML = keys.length ? '' : '<span style="color:#8b949e">—</span>';
+  var current = sel.value;
+  sel.innerHTML = '<option value="">— без токена —</option>';
+  keys.forEach(function(k) {
+    list.innerHTML += '<div class="token-entry"><b>'+k+'</b><span>'+tokens[k].substring(0,22)+'...</span></div>';
+    var opt = document.createElement('option');
+    opt.value = k; opt.textContent = k;
+    sel.appendChild(opt);
+  });
+  sel.value = activeToken;
+  var td = document.getElementById('token-display');
+  if (activeToken && tokens[activeToken]) {
+    td.textContent = tokens[activeToken].substring(0,40)+'...';
+    td.style.color = '#58a6ff';
+  } else {
+    td.textContent = 'нет активного токена';
+    td.style.color = '#8b949e';
+  }
+}
+
+function selectToken(key) {
+  activeToken = key;
+  saveTokens();
+}
+
+function clearAllTokens() {
+  tokens = {}; activeToken = '';
+  localStorage.removeItem('survey_tokens');
+  localStorage.removeItem('survey_active_token');
+  renderTokens();
+}
+
+async function sendRequest() {
+  var base   = document.getElementById('base-url-input').value.replace(/\/$/, '');
+  var path   = document.getElementById('url-input').value;
+  var url    = base + path;
+  var body   = document.getElementById('body-editor').value.trim();
+  var method = currentMethod;
+  var rb = document.getElementById('response-body');
+  var sb = document.getElementById('status-badge');
+  var rt = document.getElementById('response-time');
+
+  rb.textContent = '⏳ Отправляю...';
+  sb.textContent = '...'; sb.style.background='#21262d'; sb.style.color='#8b949e';
+
+  var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+  if (activeToken && tokens[activeToken]) headers['Authorization'] = 'Bearer ' + tokens[activeToken];
+
+  var opts = { method: method, headers: headers };
+  if (body && method !== 'GET') {
+    try { opts.body = JSON.stringify(JSON.parse(body)); } catch(e) { opts.body = body; }
+  }
+
+  var t0 = Date.now();
+  try {
+    var res  = await fetch(url, opts);
+    var elapsed = Date.now() - t0;
+    var text = await res.text();
+    rt.textContent = elapsed + ' ms';
+
+    var parsed;
+    try { parsed = JSON.parse(text); } catch(e) { parsed = null; }
+
+    // Auto-save token from login response
+    if (parsed && parsed.token) {
+      var emailMatch = body.match(/"email"\s*:\s*"([^"]+)"/);
+      var key = emailMatch ? emailMatch[1].split('@')[0] : 'user';
+      tokens[key] = parsed.token;
+      activeToken = key;
+      saveTokens();
+    }
+
+    sb.textContent = res.status + ' ' + res.statusText;
+    if (res.status >= 200 && res.status < 300) { sb.style.background='#033a16'; sb.style.color='#3fb950'; }
+    else if (res.status >= 400)                { sb.style.background='#3a0010'; sb.style.color='#ff7b72'; }
+    else                                       { sb.style.background='#1a2a3a'; sb.style.color='#79c0ff'; }
+
+    rb.innerHTML = parsed !== null ? syntaxHighlight(JSON.stringify(parsed, null, 2)) : text;
+  } catch(e) {
+    sb.textContent='ERROR'; sb.style.background='#3a0010'; sb.style.color='#ff7b72';
+    rb.textContent = '❌ ' + e.message + '\n\nПроверь: php artisan serve\nИли CORS настройки в Laravel.';
+    rt.textContent = '';
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') sendRequest();
+});
+
+renderTokens();
+</script>
+</body>
+</html>

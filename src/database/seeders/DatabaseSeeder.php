@@ -29,6 +29,14 @@ class DatabaseSeeder extends Seeder
             'role'     => 'respondent',
         ]);
 
+        // Второй респондент
+        User::create([
+            'name'     => 'Второй Респондент',
+            'email'    => 'respondent2@test.com',
+            'password' => Hash::make('password'),
+            'role'     => 'respondent',
+        ]);
+
         // Опрос с вопросами разных типов
         $survey = Survey::create([
             'user_id'     => $author->id,
