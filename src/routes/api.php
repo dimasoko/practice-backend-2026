@@ -7,9 +7,6 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\ResponseController;
 
-// Прохождение опроса
-Route::post('/surveys/{survey}/responses', [ResponseController::class, 'store']);
-
 // Публичные маршруты
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
@@ -28,6 +25,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/surveys/{survey}',        [SurveyController::class, 'destroy']);
     Route::post('/surveys/{survey}/publish',  [SurveyController::class, 'publish']);
     Route::post('/surveys/{survey}/close',    [SurveyController::class, 'close']);
+    Route::post('/surveys/{survey}/responses', [ResponseController::class, 'store']);
 
     // Вопросы
     Route::post('/surveys/{survey}/questions',              [QuestionController::class, 'store']);

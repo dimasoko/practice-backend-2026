@@ -8,9 +8,6 @@ use App\Models\Answer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-Log::info('Survey passed', ['survey_id' => $survey->id, 'user_id' => $user->id]);
-Log::warning('Survey repeat attempt blocked', ['survey_id' => $survey->id, 'user_id' => $user->id]);
-
 class ResponseController extends Controller
 {
     public function store(Request $request, Survey $survey)
@@ -30,6 +27,7 @@ class ResponseController extends Controller
             ->exists();
 
         if ($alreadyPassed) {
+            Log::warning('Survey repeat attempt blocked', ['survey_id' => $survey->id, 'user_id' => $user->id]);
             return response()->json([
                 'message' => 'Вы уже проходили этот опрос'
             ], 422);
@@ -90,6 +88,8 @@ class ResponseController extends Controller
                 }
             }
         }
+
+        Log::info('Survey passed', ['survey_id' => $survey->id, 'user_id' => $user->id]);
 
         return response()->json([
             'message'     => 'Ответы приняты',

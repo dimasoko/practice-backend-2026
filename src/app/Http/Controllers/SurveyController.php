@@ -4,10 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Survey;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
-Log::info('Survey passed', ['survey_id' => $survey->id, 'user_id' => $user->id]);
-Log::warning('Survey repeat attempt blocked', ['survey_id' => $survey->id, 'user_id' => $user->id]);
 
 class SurveyController extends Controller
 {
