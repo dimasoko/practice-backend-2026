@@ -6,6 +6,7 @@ use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\AnalyticsController;
 
 // Публичные маршруты
 Route::post('/register', [AuthController::class, 'register']);
@@ -26,6 +27,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/surveys/{survey}/publish',  [SurveyController::class, 'publish']);
     Route::post('/surveys/{survey}/close',    [SurveyController::class, 'close']);
     Route::post('/surveys/{survey}/responses', [ResponseController::class, 'store']);
+    // Аналитика
+    Route::get('/surveys/{survey}/analytics', [AnalyticsController::class, 'show']);
+    Route::get('/surveys/{survey}/export',    [AnalyticsController::class, 'export']);
 
     // Вопросы
     Route::post('/surveys/{survey}/questions',              [QuestionController::class, 'store']);

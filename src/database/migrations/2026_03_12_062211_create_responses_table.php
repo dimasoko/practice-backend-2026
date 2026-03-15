@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['survey_id', 'user_id']); // защита от повторного прохождения
+            $table->unique(['survey_id', 'user_id', 'order']); // защита от повторного прохождения
         });
     }
 

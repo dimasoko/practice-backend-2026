@@ -7,11 +7,31 @@ use Illuminate\Http\Request;
 
 class SurveyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $surveys = Survey::with('author:id,name')
-            ->withCount('responses')
-            ->paginate(10);
+        $query = Survey::with('author:id,name')->withCount('responses');
+
+        // только мои опросы
+        if ($request->boolean('mine')) {
+            $query->where('user_id', auth('api')->id());
+        }
+
+        // по статусу
+        if ($request->filled('status')) {
+            $request->validate(['status' => 'in:draft,published,closed']);
+            $query->where('status', $request->status);
+        }
+
+        $sortField = $request->get('sort', 'created_at');
+        $sortDir   = $request->get('direction', 'desc');
+
+        if ($sortField === 'responses_count') {
+            $query->orderBy('responses_count', $sortDir);
+        } else {
+            $query->orderBy('created_at', $sortDir);
+        }
+
+        $surveys = $query->paginate(10);
 
         return response()->json($surveys);
     }

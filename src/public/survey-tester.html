@@ -74,26 +74,33 @@
 
   <div class="nav-section">
     <div class="nav-section-title">Surveys</div>
-    <div class="nav-item" data-method="GET"    data-path="/api/surveys"         data-body="" data-name="GET /api/surveys"><span class="mb GET">GET</span> list</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys"         data-body="" data-name="GET /api/surveys"><span class="mb GET">GET</span> list all</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys?mine=true" data-body="" data-name="GET /api/surveys?mine=true"><span class="mb GET">GET</span> my surveys</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys?status=published" data-body="" data-name="GET /api/surveys?status=published"><span class="mb GET">GET</span> published</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys?sort=responses_count" data-body="" data-name="GET /api/surveys?sort=responses_count"><span class="mb GET">GET</span> by popularity</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys?page=2" data-body="" data-name="GET /api/surveys?page=2"><span class="mb GET">GET</span> page 2</div>
     <div class="nav-item" data-method="POST"   data-path="/api/surveys"         data-body='{"title":"Тестовый опрос","description":"Описание"}' data-name="POST /api/surveys"><span class="mb POST">POST</span> create</div>
-    <div class="nav-item" data-method="GET"    data-path="/api/surveys/1"       data-body="" data-name="GET /api/surveys/1"><span class="mb GET">GET</span> show /1</div>
-    <div class="nav-item" data-method="PUT"    data-path="/api/surveys/1"       data-body='{"title":"Обновлённый заголовок"}' data-name="PUT /api/surveys/1"><span class="mb PUT">PUT</span> update /1</div>
-    <div class="nav-item" data-method="DELETE" data-path="/api/surveys/1"       data-body="" data-name="DELETE /api/surveys/1"><span class="mb DELETE">DEL</span> delete /1</div>
-    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/publish" data-body="" data-name="POST /api/surveys/1/publish"><span class="mb POST">POST</span> publish /1</div>
-    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/close"   data-body="" data-name="POST /api/surveys/1/close"><span class="mb POST">POST</span> close /1</div>
+    <div class="nav-item" data-method="GET"    data-path="/api/surveys/1"       data-body="" data-name="GET /api/surveys/1"><span class="mb GET">GET</span> show</div>
+    <div class="nav-item" data-method="PUT"    data-path="/api/surveys/1"       data-body='{"title":"Обновлённый заголовок"}' data-name="PUT /api/surveys/1"><span class="mb PUT">PUT</span> update</div>
+    <div class="nav-item" data-method="DELETE" data-path="/api/surveys/1"       data-body="" data-name="DELETE /api/surveys/1"><span class="mb DELETE">DEL</span> delete</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/publish" data-body="" data-name="POST /api/surveys/1/publish"><span class="mb POST">POST</span> publish</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/close"   data-body="" data-name="POST /api/surveys/1/close"><span class="mb POST">POST</span> close</div>
   </div>
 
   <div class="nav-section">
     <div class="nav-section-title">Questions</div>
     <div class="nav-item" data-method="POST"   data-path="/api/surveys/1/questions"   data-body='{"text":"Ваш любимый язык?","type":"single","order":1}' data-name="POST /api/surveys/1/questions"><span class="mb POST">POST</span> create</div>
-    <div class="nav-item" data-method="PUT"    data-path="/api/surveys/1/questions/1" data-body='{"text":"Обновлённый вопрос?"}' data-name="PUT /api/surveys/1/questions/1"><span class="mb PUT">PUT</span> update /1</div>
-    <div class="nav-item" data-method="DELETE" data-path="/api/surveys/1/questions/1" data-body="" data-name="DELETE /api/surveys/1/questions/1"><span class="mb DELETE">DEL</span> delete /1</div>
+    <div class="nav-item" data-method="PUT"    data-path="/api/surveys/1/questions/1" data-body='{"text":"Обновлённый вопрос?"}' data-name="PUT /api/surveys/1/questions/1"><span class="mb PUT">PUT</span> update</div>
+    <div class="nav-item" data-method="DELETE" data-path="/api/surveys/1/questions/1" data-body="" data-name="DELETE /api/surveys/1/questions/1"><span class="mb DELETE">DEL</span> delete</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/surveys/2/questions"   data-body='{"text":"Вопрос для опроса 2","type":"multiple","order":1}' data-name="POST /api/surveys/2/questions"><span class="mb POST">POST</span> create /2</div>
   </div>
 
   <div class="nav-section">
     <div class="nav-section-title">Options</div>
-    <div class="nav-item" data-method="POST"   data-path="/api/questions/1/options"   data-body='{"text":"PHP"}' data-name="POST /api/questions/1/options"><span class="mb POST">POST</span> create</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/questions/1/options"   data-body='{"text":"PHP"}' data-name="POST /api/questions/1/options"><span class="mb POST">POST</span> create /1</div>
     <div class="nav-item" data-method="DELETE" data-path="/api/questions/1/options/1" data-body="" data-name="DELETE /api/questions/1/options/1"><span class="mb DELETE">DEL</span> delete /1</div>
+    <div class="nav-item" data-method="POST"   data-path="/api/questions/2/options"   data-body='{"text":"Python"}' data-name="POST /api/questions/2/options"><span class="mb POST">POST</span> create /2</div>
+    <div class="nav-item" data-method="DELETE" data-path="/api/questions/2/options/2" data-body="" data-name="DELETE /api/questions/2/options/2"><span class="mb DELETE">DEL</span> delete /2</div>
   </div>
 
   <div class="nav-section">
@@ -101,6 +108,17 @@
     <div class="nav-item" data-method="POST" data-path="/api/surveys/1/responses"
       data-body='{"answers":[{"question_id":1,"option_ids":[1],"text_value":null},{"question_id":2,"option_ids":[4,5],"text_value":null},{"question_id":3,"option_ids":[],"text_value":"Хочу изучить REST API"}]}'
       data-name="POST /api/surveys/1/responses"><span class="mb POST">POST</span> submit /1</div>
+    <div class="nav-item" data-method="POST" data-path="/api/surveys/2/responses"
+      data-body='{"answers":[{"question_id":2,"option_ids":[2,3],"text_value":null}]}'
+      data-name="POST /api/surveys/2/responses"><span class="mb POST">POST</span> submit /2</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Analytics</div>
+    <div class="nav-item" data-method="GET" data-path="/api/surveys/1/analytics" data-body="" data-name="GET /api/surveys/1/analytics"><span class="mb GET">GET</span> analytics /1</div>
+    <div class="nav-item" data-method="GET" data-path="/api/surveys/1/export"    data-body="" data-name="GET /api/surveys/1/export"><span class="mb GET">GET</span> export /1</div>
+    <div class="nav-item" data-method="GET" data-path="/api/surveys/2/analytics" data-body="" data-name="GET /api/surveys/2/analytics"><span class="mb GET">GET</span> analytics /2</div>
+    <div class="nav-item" data-method="GET" data-path="/api/surveys/2/export"    data-body="" data-name="GET /api/surveys/2/export"><span class="mb GET">GET</span> export /2</div>
   </div>
 
   <div id="tokens-panel">
