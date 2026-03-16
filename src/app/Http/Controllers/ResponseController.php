@@ -10,6 +10,31 @@ use Illuminate\Support\Facades\Log;
 
 class ResponseController extends Controller
 {
+/**
+ * @OA\Post(
+ *     path="/api/surveys/{survey}/responses",
+ *     summary="Пройти опрос — отправить ответы",
+ *     tags={"Responses"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(name="survey", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="answers",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="question_id", type="integer", example=1),
+ *                     @OA\Property(property="option_ids",  type="array", @OA\Items(type="integer"), example={1}),
+ *                     @OA\Property(property="text_value",  type="string",  example=null)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Ответы приняты"),
+ *     @OA\Response(response=422, description="Ошибка валидации или повтор")
+ * )
+ */
     public function store(Request $request, Survey $survey)
     {
         $user = auth('api')->user();

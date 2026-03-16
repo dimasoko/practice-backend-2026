@@ -1,0 +1,1217 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Survey API",
+        "description": "REST API сервиса опросов и голосований",
+        "contact": {
+            "name": "API Support",
+            "email": "support@survey.local"
+        },
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/surveys/{survey}/analytics": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Получить аналитику по опросу (статистика ответов)",
+                "operationId": "6cf470efb6418adf1b2e24ecafbe90e0",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Аналитика опроса",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "survey_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Опрос о языках"
+                                        },
+                                        "total_respondents": {
+                                            "type": "integer",
+                                            "example": 42
+                                        },
+                                        "questions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "question_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "question": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "single",
+                                                            "multiple",
+                                                            "text"
+                                                        ]
+                                                    },
+                                                    "answers": {
+                                                        "description": "Для text вопросов",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "options": {
+                                                        "description": "Для choice вопросов",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "option_id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "option": {
+                                                                    "type": "string"
+                                                                },
+                                                                "count": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "percent": {
+                                                                    "type": "number",
+                                                                    "example": 23.8
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен - не автор опроса"
+                    },
+                    "404": {
+                        "description": "Опрос не найден"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/surveys/{survey}/export": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Экспортировать полные данные опроса",
+                "operationId": "9de88cfc6e9c0477bccb7e84b0c76809",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Полная структура опроса с ответами пользователей",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "title": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "draft",
+                                                "published",
+                                                "closed"
+                                            ]
+                                        },
+                                        "questions": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Question"
+                                            }
+                                        },
+                                        "responses": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Response"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Доступ запрещен"
+                    },
+                    "404": {
+                        "description": "Опрос не найден"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Дима"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "dima@test.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "role": {
+                                        "description": "По умолчанию respondent",
+                                        "type": "string",
+                                        "enum": [
+                                            "author",
+                                            "respondent"
+                                        ],
+                                        "example": "respondent"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Пользователь создан и получен токен",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации - email занят или неивалидные данные"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Выход — инвалидировать токен",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Успешный выход",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Выход выполнен"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Получить текущего авторизованного пользователя",
+                "operationId": "9d9bc556f927575aa492a88c28fe5908",
+                "responses": {
+                    "200": {
+                        "description": "Данные пользователя",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/questions/{question}/options": {
+            "post": {
+                "tags": [
+                    "Options"
+                ],
+                "summary": "Создать вариант ответа (только для choice-типов: single, multiple)",
+                "operationId": "78185c94f39d4a97cc5cf5b93666ee42",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "example": "PHP"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Вариант ответа создан",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Option"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "422": {
+                        "description": "Нельзя добавить варианты к текстовому вопросу или опубликованному опросу"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/questions/{question}/options/{option}": {
+            "delete": {
+                "tags": [
+                    "Options"
+                ],
+                "summary": "Удалить вариант ответа (только автор, черновик)",
+                "operationId": "3e83bafc579ba360f49900c42ff7343d",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "option",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Вариант удален",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Вариант удалён"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "404": {
+                        "description": "Вариант не принадлежит вопросу"
+                    },
+                    "422": {
+                        "description": "Нельзя удалять варианты опубликованного опроса"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/surveys/{survey}/questions": {
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Создать вопрос в опросе (только автор, черновик)",
+                "operationId": "9513064f0c0ae507465b7400c9ca31e7",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "text",
+                                    "type",
+                                    "order"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "example": "Какой ваш любимый язык программирования?"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "single",
+                                            "multiple",
+                                            "text"
+                                        ],
+                                        "example": "single"
+                                    },
+                                    "order": {
+                                        "description": "Порядок вопроса",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Вопрос создан",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Question"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "422": {
+                        "description": "Нельзя добавлять вопросы к опубликованному опросу"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/surveys/{survey}/questions/{question}": {
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Обновить вопрос (только автор, черновик)",
+                "operationId": "16b4db88f714988136bf1c3ed6f05f1e",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "example": "Обновленный текст вопроса"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "single",
+                                            "multiple",
+                                            "text"
+                                        ]
+                                    },
+                                    "order": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Вопрос обновлен",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Question"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "404": {
+                        "description": "Вопрос не принадлежит опросу"
+                    },
+                    "422": {
+                        "description": "Нельзя редактировать вопросы опубликованного опроса"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Удалить вопрос (только автор, черновик)",
+                "operationId": "069ffbdac506f923338ac7d6828f1b95",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Вопрос удален",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "422": {
+                        "description": "Нельзя удалять вопросы опубликованного опроса"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/surveys/{survey}/responses": {
+            "post": {
+                "tags": [
+                    "Responses"
+                ],
+                "summary": "Пройти опрос — отправить ответы",
+                "operationId": "eacfeae95bef48871d25c55a335299b4",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "answers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "option_ids": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "integer"
+                                                    },
+                                                    "example": [
+                                                        1
+                                                    ]
+                                                },
+                                                "text_value": {
+                                                    "type": "string",
+                                                    "example": null
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ответы приняты"
+                    },
+                    "422": {
+                        "description": "Ошибка валидации или повтор"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/surveys": {
+            "get": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Список опросов с пагинацией и фильтрами",
+                "operationId": "7e96246f34de1fcd663f2d95a5079073",
+                "parameters": [
+                    {
+                        "name": "mine",
+                        "in": "query",
+                        "description": "Только мои опросы",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Фильтр по статусу",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published",
+                                "closed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Поле сортировки",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "created_at",
+                                "responses_count"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "description": "Направление",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Страница",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список опросов"
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/surveys/{survey}": {
+            "put": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Обновить опрос (только черновик и автор)",
+                "operationId": "004b5441c458eb1e748628dff71f780f",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Обновленное название"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Новое описание"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Опрос обновлен",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Survey"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "422": {
+                        "description": "Редактировать можно только черновик"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Surveys"
+                ],
+                "summary": "Удалить опрос (только черновик и автор)",
+                "operationId": "56fe63d4026da0b796e6ff82b49cf12f",
+                "parameters": [
+                    {
+                        "name": "survey",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Опрос удален",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Опрос удалён"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Это не ваш опрос"
+                    },
+                    "422": {
+                        "description": "Редактировать можно только черновик"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "title": "Пользователь",
+                "description": "Модель пользователя системы",
+                "properties": {
+                    "id": {
+                        "description": "ID пользователя",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Имя пользователя",
+                        "type": "string",
+                        "example": "Дима"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "dima@test.com"
+                    },
+                    "role": {
+                        "description": "Роль пользователя",
+                        "type": "string",
+                        "enum": [
+                            "author",
+                            "respondent"
+                        ],
+                        "example": "author"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Survey": {
+                "title": "Опрос",
+                "description": "Опрос с вопросами",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "description": "ID автора",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Опрос о языках программирования"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Выберите ваш любимый язык"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "published",
+                            "closed"
+                        ],
+                        "example": "draft"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "questions": {
+                        "description": "Вопросы опроса",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Question"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Question": {
+                "title": "Вопрос",
+                "description": "Вопрос в опросе",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "survey_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "text": {
+                        "type": "string",
+                        "example": "Какой ваш любимый язык?"
+                    },
+                    "type": {
+                        "description": "Тип вопроса: single (одиночный выбор), multiple (множественный выбор), text (текстовый)",
+                        "type": "string",
+                        "enum": [
+                            "single",
+                            "multiple",
+                            "text"
+                        ],
+                        "example": "single"
+                    },
+                    "order": {
+                        "description": "Порядок вопроса",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "options": {
+                        "description": "Варианты ответов (только для single/multiple)",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Option"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Option": {
+                "title": "Вариант ответа",
+                "description": "Вариант ответа на вопрос",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "text": {
+                        "type": "string",
+                        "example": "PHP"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Response": {
+                "title": "Прохождение опроса пользователем",
+                "description": "Запись о прохождении пользователем опроса",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "survey_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "answers": {
+                        "description": "Ответы пользователя",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Answer"
+                        }
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            },
+            "Answer": {
+                "title": "Ответ на вопрос",
+                "description": "Ответ пользователя на конкретный вопрос",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "response_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "option_id": {
+                        "description": "ID выбранного варианта (null для текстовых ответов)",
+                        "type": "integer",
+                        "example": 5,
+                        "nullable": true
+                    },
+                    "text_value": {
+                        "description": "Текстовый ответ (null для выбора вариантов)",
+                        "type": "string",
+                        "example": "Другой язык",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "question": {
+                        "$ref": "#/components/schemas/Question"
+                    },
+                    "option": {
+                        "$ref": "#/components/schemas/Option"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "title": "Ошибка",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Ошибка валидации"
+                    },
+                    "errors": {
+                        "description": "Детали ошибок валидации",
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "JWT токен в формате: Authorization: Bearer {token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Analytics",
+            "description": "Analytics"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Options",
+            "description": "Options"
+        },
+        {
+            "name": "Questions",
+            "description": "Questions"
+        },
+        {
+            "name": "Responses",
+            "description": "Responses"
+        },
+        {
+            "name": "Surveys",
+            "description": "Surveys"
+        }
+    ]
+}
